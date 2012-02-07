@@ -1,0 +1,46 @@
+# cat =vz-double-resources
+#!/bin/bash
+
+VZ="$1"
+RESOURCE="$2"
+
+if [ -z $VZ ] || [ -z $RESOURCE ]; then
+    echo "Usage: $0 VZ RESOURCE"
+    exit 1
+fi
+
+case $0 in
+        *-double-*) OPERATION="*2" ;;
+        *-half-*)   OPERATION="/2" ;;
+        *) echo "Invalid: $0" ; exit 1;;
+esac
+
+echo "# Operation: $OPERATION"
+
+# get failures:
+# awk '$NF ~ /[0-9]*[1-9]$/' /proc/bc/*/resources
+
+if [ -f /proc/bc/$VZ/resources ] ; then
+# uid  resource                     held              maxheld              barrier                limit              failcnt
+
+        resource=$(echo $RESOURCE | tr '[:upper:]' '[:lower:]')
+        awk /$resource/ /proc/bc/$VZ/resources | {
+                read resource held maxheld barrier limit failcnt
+                cmd="vzctl set $VZ --$resource $(($barrier $OPERATION)):$(($limit $OPERATION)) --save"
+                echo $cmd
+        }
+elif [ -f /etc/vz/conf/$VZ.conf ] ; then
+        value=$(grep -i "^$RESOURCE=" /etc/vz/conf/$VZ.conf)
+        eval $value
+        RESOURCE=$(echo $RESOURCE | tr '[:lower:]' '[:upper:]')
+        resource=$(echo $RESOURCE | tr '[:upper:]' '[:lower:]')
+        value=$(eval echo \$${RESOURCE})
+        echo $value | {
+                IFS=: read barrier limit
+                cmd="vzctl set $VZ --$resource $(($barrier $OPERATION)):$(($limit $OPERATION)) --save"
+                echo $cmd
+        }
+else
+        echo "ERROR: container $VZ not found."
+        exit 1
+fi
