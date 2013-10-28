@@ -45,7 +45,7 @@ vzctl set $CTID --applyconfig vps.basic --save
 vzctl set $CTID --ipadd 10.0.156.$CTID --save
 vzctl set $CTID --nameserver 10.0.156.4 --save
 vzctl set $CTID --hostname $HOSTNAME.fen.aptivate.org --save
-vzctl start $CTID
+vzctl start $CTID --wait
 
 # install puppet and do first run
 vzctl exec2 $CTID apt-get -y update

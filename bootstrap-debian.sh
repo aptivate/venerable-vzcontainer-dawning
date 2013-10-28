@@ -40,11 +40,11 @@ cp -ra /opt/bootstrap-lenny/* /vz/private/$CTID/
 #cp -a  /etc/vz/dists/debian-4.0.conf  /etc/vz/dists/debian-5.0.conf
 echo "OSTEMPLATE=debian-5.0" >> /etc/vz/conf/$CTID.conf
 
-vzctl set $CTID --applyconfig vps.basic --save
+vzctl set $CTID --applyconfig basic --save
 vzctl set $CTID --ipadd 10.0.156.$CTID --save
-vzctl set $CTID --nameserver 10.0.156.1 --save
+vzctl set $CTID --nameserver "10.0.156.4 10.0.156.8" --save
 vzctl set $CTID --hostname $HOSTNAME.fen.aptivate.org --save
-vzctl start $CTID
+vzctl start $CTID --wait
 
 # install puppet and do first run
 vzctl exec2 $CTID apt-get -y update

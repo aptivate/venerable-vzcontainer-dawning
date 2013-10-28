@@ -25,14 +25,15 @@ if invalidHostname "$HOSTNAME" ; then
 fi
 
 vzctl create $CTID --ostemplate ubuntu-10.04-x86
+#vzctl create $CTID --ostemplate ubuntu-10.04-standard_10.04-4_i386
 vzctl set $CTID --applyconfig vps.basic --save
 vzctl set $CTID --ipadd 10.0.156.$CTID --save
-vzctl set $CTID --nameserver 10.0.156.4 --save
+vzctl set $CTID --nameserver "10.0.156.4 10.0.156.8" --save
 vzctl set $CTID --hostname $HOSTNAME.fen.aptivate.org --save
 vzctl set $CTID --diskspace 6G:8G --save
 vzctl set $CTID --privvmpages 512M:1G --save
 vzctl set $CTID --name $HOSTNAME --save
-vzctl start $CTID
+vzctl start $CTID --wait
 
 # install puppet and do first run
 vzctl exec2 $CTID apt-get -y update

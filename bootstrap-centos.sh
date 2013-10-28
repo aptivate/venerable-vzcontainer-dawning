@@ -34,18 +34,19 @@ fi
 vzctl create $CTID --ostemplate centos-5-standard_5.6-1_i386 &&
 vzctl set $CTID --applyconfig $VZCONFIG --save && 
 vzctl set $CTID --ipadd 10.0.156.$CTID --save && 
-vzctl set $CTID --nameserver 10.0.156.4 --save && 
+vzctl set $CTID --nameserver "10.0.156.4 10.0.156.8" --save && 
 vzctl set $CTID --hostname $HOSTNAME.fen.aptivate.org --save && 
 vzctl set $CTID --diskspace 6G:8G --save && 
 vzctl set $CTID --privvmpages 512M:1G --save && 
 vzctl set $CTID --name $HOSTNAME --save &&
-vzctl start $CTID
+vzctl start $CTID --wait
 
 if [ $? -eq 0 ] ; then
 	# install puppet and do first run
-	vzctl exec2 $CTID rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386/epel-release-5-4.noarch.rpm &&
+	vzctl exec2 $CTID wget -O /etc/yum.repos.d/aptivate.repo http://lin-repo.aptivate.org/yum/centos/5/aptivate.repo &&
 	vzctl exec2 $CTID yum install -y puppet &&
 	vzctl exec2 $CTID /usr/sbin/puppetd --test --server puppet.aptivate.org
+	vzctl exec2 $CTID yum update -y
 fi
 
 exit
