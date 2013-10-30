@@ -22,8 +22,9 @@ VZ_EXEC2="vzctl exec2 $CTID"
 
 # http://download.openvz.org/template/precreated/centos-5-x86-devel.tar.gz
 set -e
+openvz_version_customizations
 create_vzcontainer_from_template "centos-6-standard_6.3-1_i386"
-vzctl start $CTID --wait
+start_vzcontainer
 
 if [ $? -eq 0 ] ; then
 	wire_puppet_for_os $OSFAMILY
