@@ -8,17 +8,29 @@ OSRELEASE="6"
 
 . ${DAWNING_PLACE}/venerable_functions.sh
 
-chekNumberOfArgs
+if hostname | grep fen-vz2 ; then
+	echo "bootstrap-centos6-x86_64 is known to be broken on fen-vz2"
+	echo "edit the script if you want to test"
+	exit 1
+fi
+
+if [ $# -ne 2 ] ; then
+	echo "Usage: $0 CTID hostname"
+	exit 1
+fi
 
 CTID="$1"
 HOSTNAME="$2"
 
 validateArgs
 
+VZ_EXEC2="vzctl exec2 $CTID"
+
 # http://download.openvz.org/template/precreated/centos-6-x86_64-devel.tar.gz
 set -e
+openvz_version_customizations
 create_vzcontainer_from_template "centos-6-x86_64-devel"
-vzctl start $CTID --wait
+start_vzcontainer
 
 if [ $? -eq 0 ] ; then
 	wire_puppet_for_os $OSFAMILY
@@ -27,6 +39,7 @@ fi
 
 exit
 
-postinstallNotes
-
+## post install
+# need to get it configured quick - really cfengine/puppet job.
+# follow the instructions at https://wiki.aptivate.org/Wiki.jsp?page=NetworkInfrastructure.Puppet
 
